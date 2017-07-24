@@ -10,6 +10,7 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -21,12 +22,26 @@ import java.util.logging.Logger;
  */
 public class PeerToPeer {
 
-    static String name="Jairox";
+    static String name;
     static InetAddress ipBroadcast;
+    static String interfaz;
+    static int portEscucha;
+    static int portEnvio;
+    static ArrayList<Nodo> lista;
     public static void main(String[] args) throws UnknownHostException {
         
+        if(args.length<4){
+            System.out.println("Faltan Datos");
+            System.exit(0);
+        }
+        lista = new ArrayList<>();
+        interfaz=args[0];
+        name=args[1];
+        System.out.println(name);
+        portEscucha=Integer.parseInt(args[2]);
+        portEnvio=Integer.parseInt(args[3]);
         
-      
+                        
         empezarP2P();
         
           
@@ -34,6 +49,7 @@ public class PeerToPeer {
     
     static void empezarP2P(){
         ipBroadcast= setBroadcastip();
+        System.out.println("ipBroadCast\t"+ipBroadcast.getHostAddress());
         if(ipBroadcast == null){
             System.out.println("No se pudo obtener la ipBroadCast de la red");
             System.exit(0);
@@ -41,8 +57,8 @@ public class PeerToPeer {
         
         ExecutorService ex = Executors.newCachedThreadPool();
      
-        ex.submit(new Salida(ipBroadcast, 6000, name));
-        ex.submit(new Ingreso(ipBroadcast, 5000,name));   
+        ex.submit(new Salida(ipBroadcast, portEnvio, name,lista));
+        ex.submit(new Ingreso(ipBroadcast, portEscucha,name,lista));   
         
         
        
@@ -51,8 +67,8 @@ public class PeerToPeer {
 
     private static InetAddress setBroadcastip(){
         try {
-            //wlp8s0
-            NetworkInterface network = NetworkInterface.getByName("wlp8s0");
+            
+            NetworkInterface network = NetworkInterface.getByName(interfaz);
             for(InterfaceAddress temp : network.getInterfaceAddresses()){
                 InetAddress add = temp.getBroadcast();
                 if(add ==null)
