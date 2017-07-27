@@ -109,6 +109,7 @@ public class Ingreso implements Runnable{
                int range = Integer.parseInt(tokens.nextToken());
                String array = tokens.nextToken();
                Cartas cartas = new Cartas(range,array, lista);
+               disponibleCARTAS=true;
               
                 break;
                 }     

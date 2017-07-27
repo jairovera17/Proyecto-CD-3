@@ -79,8 +79,8 @@ public class Cartas {
             
         }
         
-        Collections.sort(misCartas);
-        Collections.sort(noCartas);
+      //  Collections.sort(misCartas);
+       // Collections.sort(noCartas);
       
        
     }
