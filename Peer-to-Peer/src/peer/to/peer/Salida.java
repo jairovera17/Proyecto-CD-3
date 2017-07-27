@@ -57,45 +57,53 @@ public class Salida implements Runnable {
     }
     
     private void verDisponibles(){
+        double start = System.currentTimeMillis();
+        double end=start;
+        
+        
+        do{
         try {
             byte [] buf = new byte[256];
           
-               System.out.println("**************************************");
+             
             String msj = "--listar";
-            lista.clear();
+           
             buf=msj.getBytes();
             DatagramPacket packet = new DatagramPacket(buf, buf.length,ipBroadcast,port);
             socket.send(packet);
-            Thread.sleep(5000);
-            System.out.println("Usuarios en la red incluyendome: "+lista.size());
-             for(Nodo nodo: lista){
-                        System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
-                    }
-             if(lista.get(0).name.equals(name)){
-                 System.out.println("YO soy dealer\n Empiezo a repartir");
-                 globalRandom.clear();
-                for(Nodo nodo : lista){
-                    System.out.println("Enviando a "+nodo.address);
-                     ArrayList<Integer> misRandom = getRandom(10,lista.size()*10);
-                     for(Integer integral : misRandom){
-                         System.out.println(integral);
-                         
-                     }
-                }
-                
-                 
-             }
             
-                  
+            
+              
+             end=System.currentTimeMillis();
             
           
             
             
         } catch (IOException ex) {
             Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }   
+        
+        }while((end-start)<5000);
+         System.out.println("Usuarios en la red para iniciar juego incluyendome: "+lista.size());
+         for(Nodo nodo: lista){
+                        System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
+                    }
+             if(lista.get(0).name.equals(name)){
+                 System.out.println("YO soy dealer\n Empiezo a repartir");
+                 globalRandom.clear();
+                 int range=1;
+                for(Nodo nodo : lista){
+                    System.out.println("Enviando a "+nodo.address);
+                     ArrayList<Integer> misRandom = getRandom(10,lista.size()*10);
+                     enviarMSJ(nodo.name+"@inicio"+"@"+(range*10), arrayToString(misRandom));
+                   range++;
+                }
+                
+                 
+             }
+        
+        
+        
     }
     
     private ArrayList<Integer> getRandom(int len,int size){
@@ -128,6 +136,7 @@ public class Salida implements Runnable {
                 BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
                 
                 temp = in.readLine();
+               
                 if(temp.equals("--listar")){
                     lista.clear(); 
                    
@@ -154,5 +163,34 @@ public class Salida implements Runnable {
             }
         }
     }
+    
+    private String arrayToString(ArrayList<Integer> num){
+        String salida="";
+        for(int i=0;i<num.size()-1;i++){
+            salida+=num.get(i)+"|";
+        }
+        salida+=num.get(num.size()-1);
+        return salida;
+        
+    }
+    
+     private void enviarMSJ(String tag,String msj){
+       
+            try {
+                byte [] buf = new byte[256];
+                
+               String reporte=tag+"@"+msj;
+                buf = reporte.getBytes();
+               
+               DatagramPacket packet = new DatagramPacket(buf,buf.length,ipBroadcast,port);     
+                socket.send(packet);
+              
+            } catch (IOException ex) {
+                Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+    }
+    
+   
     
 }

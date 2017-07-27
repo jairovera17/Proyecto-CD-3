@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import static peer.to.peer.PeerToPeer.disponibleCARTAS;
 /**
  *
  * @author jairo
@@ -62,6 +62,7 @@ public class Ingreso implements Runnable{
                 String received = new String(packet.getData(), 0, packet.getLength());
               
                 String parser=parsear(received,packet.getAddress().getHostAddress());
+               
                if(parser!=null){
                 System.out.println(parser);   
                }
@@ -74,6 +75,9 @@ public class Ingreso implements Runnable{
     }
     
     private String parsear(String msj, String hostAddress){
+        if(disponibleCARTAS==true){
+            
+        
        
          if(msj.equals("--listar")){
             enviarNombre();
@@ -95,12 +99,34 @@ public class Ingreso implements Runnable{
             }
               
             if(index.equals(name)){
+                String asign = tokens.nextToken();
+                if(asign.equals("inicio")){
+                   //estoy empezando juego 
+                   disponibleCARTAS=false;
+                   for(Nodo nodo: lista){
+                if(nodo.name.equals(this.name)){
+               lista.remove(nodo);
+               int range = Integer.parseInt(tokens.nextToken());
+               String array = tokens.nextToken();
+               Cartas cartas = new Cartas(range,array, lista);
+              
+                break;
+                }     
+                }   
+                   
+                }
+                
+                else{
                 for(Nodo nodo: lista){
                 if(nodo.address.equals(hostAddress)){
                 System.out.println(nodo.name+" desde "+hostAddress+" dice:");
               
                 break;
-                }
+                }     
+                }   
+               
+                
+               
                
             }     
             }
@@ -108,6 +134,7 @@ public class Ingreso implements Runnable{
         }
            
         if(index.equals("report")){
+            
             String nodo =tokens.nextToken();
             
             /*for(Nodo aux:lista){
@@ -123,6 +150,7 @@ public class Ingreso implements Runnable{
             boolean nuevo = true;
             for(Nodo aux:lista){
                 if(aux.address.equals(nuevoNodo.address)){
+                     
                     nuevo=false;
                     break;    
                 }
@@ -146,10 +174,31 @@ public class Ingreso implements Runnable{
             }
                   
         return null;
-        
+        }
+        enviarMSJ("global","Estoy ocupado");
+        return null;
         
         
     }
+    
+    private void enviarMSJ(String tag,String msj){
+       
+            try {
+                byte [] buf = new byte[256];
+                
+               String reporte=tag+"@"+msj;
+                buf = reporte.getBytes();
+               
+               DatagramPacket packet = new DatagramPacket(buf,buf.length,ipBroadcast,port);     
+                socket.send(packet);
+              
+            } catch (IOException ex) {
+                Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+    }
+    
+    
     private void enviarNombre(){
         
             try {

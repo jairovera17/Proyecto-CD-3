@@ -38,12 +38,14 @@ public class PeerToPeer {
     static ArrayList<Nodo> lista;
     static TreeMap tree;
     static String filepath="src/archivos/palabras.txt";
+    static boolean disponibleCARTAS;
     public static void main(String[] args) throws UnknownHostException {
         
         if(args.length!=4){
             System.out.println("/src/archivos/palabras.txt");
             System.exit(0);
         }
+        disponibleCARTAS=true;
         lista = new ArrayList<>();
         interfaz=args[0];
        name=args[1];
@@ -55,13 +57,17 @@ public class PeerToPeer {
 //           portEscucha=6000;
 //           portEnvio=5000;
 
+      empezarP2P();   
+ //TreeMap tree = getTreeMapFile(filepath);
+    
+     //Cartas carta = new Cartas(10, "13|1|45|3|23|45|4|2|6|10", null);
+     
        
- TreeMap tree = getTreeMapFile(filepath);
-        empezarP2P();
-      
-       
+    
+     
        // imprimirTree(tree);
     }
+    
     
     static void empezarP2P(){
         ipBroadcast= setBroadcastip();
