@@ -11,7 +11,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +29,8 @@ public class Ingreso implements Runnable{
     private String name;
     private int port;
     private ArrayList<Nodo> lista;
+    
+   
    
     public Ingreso(InetAddress ipBroadcast,int port,String name,ArrayList<Nodo> lista){
         this.ipBroadcast = ipBroadcast;
@@ -115,7 +120,27 @@ public class Ingreso implements Runnable{
             Nodo nuevoNodo = new Nodo();
             nuevoNodo.name=nodo;
             nuevoNodo.address=hostAddress;
-                lista.add(nuevoNodo);
+            boolean nuevo = true;
+            for(Nodo aux:lista){
+                if(aux.address.equals(nuevoNodo.address)){
+                    nuevo=false;
+                    break;    
+                }
+                    
+                
+            }    
+            if(nuevo)
+            {
+            lista.add(nuevoNodo);
+            Collections.sort(lista,new Comparator<Nodo>() {
+         @Override
+        public int compare(Nodo s1, Nodo s2) {
+                return s1.name.compareToIgnoreCase(s2.name);
+        }
+    });
+            }
+            
+                
             //    System.out.println("Usuario Connectado: "+nodo+"\t"+hostAddress);
                 return null;
             }
