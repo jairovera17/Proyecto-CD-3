@@ -145,14 +145,7 @@ public class Ingreso implements Runnable{
         if(index.equals("report")){
             
             String nodo =tokens.nextToken();
-            
-            /*for(Nodo aux:lista){
-                System.out.println(aux.address+"\t"+hostAddress);
-                if(aux.address.equals(hostAddress)){
-                    System.out.println("Repetido");
-                
-                    return null;}
-            }*/
+          
             Nodo nuevoNodo = new Nodo();
             nuevoNodo.name=nodo;
             nuevoNodo.address=hostAddress;

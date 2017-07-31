@@ -161,39 +161,14 @@ public class Salida implements Runnable {
                         System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
                         
                     }
-                    /////////
-                    ///nuevo
-                    /////////
-                  /*
-                    
-                   String nombre = lista.get(0).name;
-                     String cadena = "palabras";
-                    buf2 = cadena.getBytes();
-                    
-                    DatagramPacket packet2 = new DatagramPacket(buf2,buf2.length,ipBroadcast,port);
-                    socket.send(packet2);
-                    
-                   if(nombre.equals(name)){
-                       int x =0;
-                       for(Nodo nodo: lista){
-                        System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
-                        
-                    
-                    for(int i=x;i<=n*10;i+=n){
-                        String envio = nodo.name+"@"+(i*x)+"@"+listaPalabras.get(i)+"@"+x;
-                        
-                        buf2 = envio.getBytes();
-                      packet2 = new DatagramPacket(buf2,buf2.length,ipBroadcast,port);
-                    socket.send(packet2);
-                        
-                    }
-                        
-                    }
-                    
-                       
-                   }*/
+                   
+                
                    
                 }
+                 
+                 if(temp.equals("jugar")){
+                     jugar();
+                 }
               
             } catch (IOException ex) {
                 Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
@@ -201,6 +176,34 @@ public class Salida implements Runnable {
                 Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    private void jugar(){
+            
+                int x=0;
+                String msjEnvio=null;
+                byte [] buf = new byte[256];
+		
+               for(Nodo nodo : lista){
+                  
+                   x++;
+                   for(int i =x;i<=lista.size()*10;i+=lista.size()){
+                       
+                       msjEnvio=nodo.name+"@"+(i)+"@"+i+"@"+x;
+                       System.out.println("Enviando"+msjEnvio);
+                               buf =msjEnvio.getBytes();
+                      DatagramPacket packetCarta = new DatagramPacket(buf,buf.length,ipBroadcast,port);
+                       try {
+                           socket.send(packetCarta);
+                       } catch (IOException ex) {
+                           Logger.getLogger(Salida.class.getName()).log(Level.SEVERE, null, ex);
+                       }
+                               
+                   }
+                   
+               }
+
+                       
     }
     
     private String arrayToString(ArrayList<Integer> num){
