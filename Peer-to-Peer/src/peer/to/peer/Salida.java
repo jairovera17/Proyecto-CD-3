@@ -19,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import static peer.to.peer.PeerToPeer.listaPalabras;
+
+
 
 
 /**
@@ -52,7 +55,7 @@ public class Salida implements Runnable {
     }
     @Override
     public void run() {
-       verDisponibles();
+   //   verDisponibles();
      enviar();
     }
     
@@ -93,9 +96,11 @@ public class Salida implements Runnable {
                  globalRandom.clear();
                  int range=1;
                 for(Nodo nodo : lista){
-                    System.out.println("Enviando a "+nodo.address);
-                     ArrayList<Integer> misRandom = getRandom(10,lista.size()*10);
-                     enviarMSJ(nodo.name+"@inicio"+"@"+(range*10), arrayToString(misRandom));
+                  
+                  
+                     enviarMSJ(nodo.name,"inicio");
+                     enviarMSJ(nodo.name,"inicio");
+                     enviarMSJ(nodo.name,"inicio");
                    range++;
                 }
                 
@@ -149,10 +154,44 @@ public class Salida implements Runnable {
                DatagramPacket packet = new DatagramPacket(buf,buf.length,ipBroadcast,port);     
                 socket.send(packet);
                  if(temp.equals("--listar")){
+                     int n=0;
+                     byte buf2 [] = new byte[256];
                     Thread.sleep(1000);
                     for(Nodo nodo: lista){
                         System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
+                        
                     }
+                    /////////
+                    ///nuevo
+                    /////////
+                  /*
+                    
+                   String nombre = lista.get(0).name;
+                     String cadena = "palabras";
+                    buf2 = cadena.getBytes();
+                    
+                    DatagramPacket packet2 = new DatagramPacket(buf2,buf2.length,ipBroadcast,port);
+                    socket.send(packet2);
+                    
+                   if(nombre.equals(name)){
+                       int x =0;
+                       for(Nodo nodo: lista){
+                        System.out.println("Usuario Connectado: "+nodo.name+"\t"+nodo.address);
+                        
+                    
+                    for(int i=x;i<=n*10;i+=n){
+                        String envio = nodo.name+"@"+(i*x)+"@"+listaPalabras.get(i)+"@"+x;
+                        
+                        buf2 = envio.getBytes();
+                      packet2 = new DatagramPacket(buf2,buf2.length,ipBroadcast,port);
+                    socket.send(packet2);
+                        
+                    }
+                        
+                    }
+                    
+                       
+                   }*/
                    
                 }
               

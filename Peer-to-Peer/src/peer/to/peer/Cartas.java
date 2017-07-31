@@ -16,8 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import java.util.StringTokenizer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,15 +32,16 @@ public class Cartas {
     ArrayList<Integer> misCartas;
     ArrayList<Integer> noCartas;
     public ArrayList<Nodo> players;
+    Nodo yo;
     
-    public Cartas(int range, String cartas,ArrayList<Nodo> players){
+    /*public Cartas(Nodo yo,ArrayList<Nodo> players){
         this.rangedown=range-9;
         this.rangeup=range;
         this.initCartas = parsearArray(cartas);
         this.players=players;
         
         iniciarOrdenamiento();
-    }
+    }*/
    
     
     private ArrayList<String> parsearArray(String cadena){
@@ -94,25 +94,36 @@ public class Cartas {
               Collections.sort(misCartas);
         }
         else{
-            ExecutorService ex = Executors.newCachedThreadPool();
-            ex.submit(new Ofrezco());
+            System.out.println("Usuarios en juego"+players.size());
+           ArrayList<Thread> array = new ArrayList<>();
+           array.add(new Ofrezco());
+           array.get(0).start();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException ex1) {
                 Logger.getLogger(Cartas.class.getName()).log(Level.SEVERE, null, ex1);
             }
             //me excluyo (players size -1)
             for(int i=0;i<players.size();i++){
-                ex.submit(new Solicito(players.get(i).address));
+                System.out.println(players.get(i).address);
+                array.add(new Solicito(players.get(i).address));
+                array.get(i+1).start();
+              
             }
             
-            ex.shutdown();
-            while(!ex.isShutdown()){
-                
+            for(Thread t : array){
+                try {
+                    t.join();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Cartas.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            
+            
+            
             Collections.sort(misCartas);
         }
-        System.out.println("**************************************************");
+        System.out.println("*****************FIN*********************************");
         System.out.println("Mis cartas: "+Arrays.toString(misCartas.toArray()));
         System.out.println("No mis cartas: "+Arrays.toString(noCartas.toArray()));
         
@@ -120,7 +131,7 @@ public class Cartas {
     }
     
     
-    private class Solicito implements Runnable{
+    private class Solicito extends Thread{
 
         String hostname;
         public Solicito(String ip){
@@ -138,10 +149,11 @@ public class Cartas {
                  out = new PrintWriter(socket.getOutputStream(), true);
                  in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  
-                 
+                 System.out.println("Estoy dentro");
                 //le doy mi rango
                 out.println(rangeup);
                 String response = in.readLine();
+                System.out.println(response);
                 StringTokenizer tokens = new StringTokenizer(response,"|");
                 while(tokens.hasMoreTokens()){
                     int aux =Integer.parseInt(tokens.nextToken());
@@ -149,7 +161,7 @@ public class Cartas {
                      
                 }
                 
-                socket.close();
+               
             } catch (IOException ex) {
                 Logger.getLogger(Cartas.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -158,30 +170,38 @@ public class Cartas {
         }
         
     }
-    private class Ofrezco implements Runnable{
+    private class Ofrezco extends Thread{
 
         
         
         @Override
         public void run() {
             try {
-                ExecutorService ofrezcoEX = Executors.newCachedThreadPool();
+                
                 ServerSocket serversocket = new ServerSocket(6000);
-            
+            ofrescoThread ar [] = new ofrescoThread[players.size()];
               for(int i=0;i<players.size();i++){
                   Socket socket = serversocket.accept();
-                    ofrezcoEX.submit(new ofrescoThread(socket));
+                  ar[i]= new ofrescoThread(socket);
+                  ar[i].start();
+              }
+              
+             
+              for(ofrescoThread temp : ar){
+                  temp.join();
               }
                     
                 
                 
             } catch (IOException ex) {
                 Logger.getLogger(Cartas.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Cartas.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         }
         
-        class ofrescoThread implements Runnable{
+        class ofrescoThread extends Thread{
             private Socket socket;
             public ofrescoThread(Socket socket){
                 this.socket = socket;
@@ -207,9 +227,9 @@ public class Cartas {
                         
                         
                     }
-                    
-                    out.println(parsearString(response));
-                  socket.close();
+                    String respuesta ="Respuesta"+parsearStringOfrezco(response);
+                    out.println(respuesta);
+                  
                             
                             
                             
@@ -218,6 +238,16 @@ public class Cartas {
                 }
                 
                }
+            
+              private String parsearStringOfrezco(ArrayList<Integer> lista){
+        String salida="";
+        for (int i = 0; i < lista.size()-1; i++) {
+            salida+=lista.get(i)+"|";
+        }
+        salida+=lista.get(lista.size()-1);
+        return salida;
+        
+    }
         }
         
     }
