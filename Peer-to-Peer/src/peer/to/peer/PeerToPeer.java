@@ -39,7 +39,7 @@ public class PeerToPeer {
     static TreeMap tree;
     static String filepath="src/archivos/palabras.txt";
     static boolean disponibleCARTAS;
-    static ArrayList listaPalabras;
+    static ArrayList<String> listaPalabras;
     static ArrayList<String> initCartas;
     static ArrayList<Integer> misCartas;
     static ArrayList<Integer> noCartas;

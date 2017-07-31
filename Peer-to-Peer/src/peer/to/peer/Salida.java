@@ -13,13 +13,14 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-import static peer.to.peer.PeerToPeer.listaPalabras;
+
 
 
 
@@ -168,6 +169,20 @@ public class Salida implements Runnable {
                  
                  if(temp.equals("jugar")){
                      jugar();
+                 }
+                 if(temp.equals("--miscartas")){
+                      System.out.println("Mis cartas: "+Arrays.toString(PeerToPeer.misCartas.toArray()));
+                     for(Integer index: PeerToPeer.misCartas){
+                         System.out.println(PeerToPeer.listaPalabras.get(index));
+                         
+                     }
+                 }
+                  if(temp.equals("--nocartas")){
+                     System.out.println("no mis cartas: "+Arrays.toString(PeerToPeer.noCartas.toArray()));
+                       for(Integer index: PeerToPeer.noCartas){
+                         System.out.println(PeerToPeer.listaPalabras.get(index));
+                         
+                     }
                  }
               
             } catch (IOException ex) {

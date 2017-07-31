@@ -104,24 +104,7 @@ public class Ingreso implements Runnable{
               
             if(index.equals(name)){
                 String asign = tokens.nextToken();
-                if(asign.equals("inicio")){
-                   //estoy empezando juego 
-                   disponibleCARTAS=false;
-                   for(Nodo nodo: lista){
-                if(nodo.name.equals(this.name)){
-               lista.remove(nodo);
-               int range = Integer.parseInt(tokens.nextToken());
-               String array = tokens.nextToken();
-            //   Cartas cartas = new Cartas(range,array, lista);
-               disponibleCARTAS=true;
-              
-                break;
-                }     
-                }   
-                   
-                }
-                
-                else{
+           
                 for(Nodo nodo: lista){
                 if(nodo.address.equals(hostAddress)){
                 System.out.println(nodo.name+" desde "+hostAddress+" dice:");
@@ -134,12 +117,76 @@ public class Ingreso implements Runnable{
                 
                
                
-            }
+            
                 System.out.println("Alguien en la red te dice: ");
                 return asign;
             }
              System.out.println("Alguien en la red les dice a todos: ");
             return tokens.nextToken(); 
+        }
+        
+        
+        if(index.equals("jugar")){
+            
+            for(Nodo nodo: lista){
+                if(nodo.address.equals(hostAddress)){
+                    System.out.println(nodo.name+" desde "+nodo.address+" entrega las siguientes cartas");
+                    break;
+                }
+            }
+            
+            for(int i=0;i<lista.size()*10;i++){
+                
+                byte [] buf = new byte[256];
+                DatagramPacket packet =  new DatagramPacket(buf,buf.length);
+                try {
+                    socket.receive(packet);
+                } catch (IOException ex) {
+                    Logger.getLogger(Ingreso.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                String msjRecv = new String(packet.getData(), 0, packet.getLength());
+                System.out.println("msj recv "+msjRecv);
+                
+                if(!msjRecv.equals("jugar")){
+                    StringTokenizer tokensJuego =new StringTokenizer(msjRecv,"@");
+                    String nombre = tokensJuego.nextToken();
+                    int carta = Integer.parseInt(tokensJuego.nextToken());
+                    String nombrePalabra= tokensJuego.nextToken();
+                    
+                     System.err.println(nombre+" nombre original " +nombre+" "+carta+" "+nombrePalabra);
+            
+                     if(nombre.equals(this.name)){
+                         initCartas.add(carta+"");
+                         this.rango=Integer.parseInt(tokensJuego.nextToken());
+                     }
+                }
+                
+                
+                
+            }
+              
+        ordenar(this.rango);
+             try {
+                 Thread.sleep(1000);
+             } catch (InterruptedException ex) {
+                 Logger.getLogger(Ingreso.class.getName()).log(Level.SEVERE, null, ex);
+             }
+        intercambiar();
+         
+        }
+        
+         ///////////////////////////////////////////////////////////////////////////////////
+       
+        if(index.equals("intercambio")){
+            int carta = Integer.parseInt(tokens.nextToken());
+        if((this.rango-1)*10<carta&&(this.rango)*10>=carta){
+            misCartas.add(carta);
+            System.out.println("Mis cartas: "+Arrays.toString(misCartas.toArray()));
+            
+            if(misCartas.size()==10){
+                finJuego();
+            }
+            }
         }
            
         if(index.equals("report")){
@@ -177,7 +224,7 @@ public class Ingreso implements Runnable{
                   
         return null;
         }
-        enviarMSJ("global","Estoy ocupado");
+       
         return null;
         
         
@@ -186,6 +233,10 @@ public class Ingreso implements Runnable{
         
     }
     
+       private void finJuego(){
+           System.out.println("Fin del Juego: \n"+Arrays.toString(misCartas.toArray()));
+       }
+       
     private void enviarMSJ(String tag,String msj){
        
             try {
@@ -221,8 +272,9 @@ public class Ingreso implements Runnable{
       
     }
     
+   
     
-    private void ordenamiento(int rango){
+    private void ordenar(int rango){
         
         for(String cadena:initCartas){
             int aux = Integer.parseInt(cadena);
@@ -238,10 +290,10 @@ public class Ingreso implements Runnable{
            Collections.sort(noCartas);
       
     }
-    private void intercambio(){
+    private void intercambiar(){
         byte[] intercambio = new byte[256];
         for(Integer num : noCartas){
-            String cambio = "intercambio@"+num+"@"+listaPalabras.get(0);
+            String cambio = "intercambio@"+num+"@"+listaPalabras.get(num);
             intercambio = cambio.getBytes();
             DatagramPacket packet = new DatagramPacket(intercambio,intercambio.length,ipBroadcast,port);
             try {
